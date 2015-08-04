@@ -4,12 +4,13 @@ A Chip 8 emulator written in C++
 
 TODO:
 1) DONE: Input a filename to use as a ROM.
-2) Read from the ROM and correctly initialize memory.
-3) Implement each opcode
-4) DONE: Draw screen using SDL
-5) Handle input using SDL
-6) Add sample ROMs and include a link.
-7) Add the "fontset" functionality.
+2) DONE: Read from the ROM and correctly initialize memory.
+3) Keep count on cycles and only run at 60 mhz.
+4) Implement each opcode
+5) DONE: Draw screen using SDL
+6) Handle input using SDL
+7) Add sample ROMs and include a link.
+8) Add the "fontset" functionality.
 
 
 
@@ -21,8 +22,9 @@ Development steps
 3) Debugging support.
 4) Tests, tests, tests.
 5) ROM file support.
-6) Graphical Display support.
-7) Input support.
+6) Cycle counting and throttling, etc.
+7) Graphical Display support.
+8) Input support.
 
 
 

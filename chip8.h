@@ -4,6 +4,7 @@
 #define SCREEN_HEIGHT 32
 #define NUM_REG 16
 #define MEM_SIZE 4096
+#define PC_START 0x200
 
 class Chip8 {
     private:

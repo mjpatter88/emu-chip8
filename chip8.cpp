@@ -4,10 +4,8 @@
 #include <SDL2/SDL.h>
 #include "chip8.h"
 
-// Debug output
-#define DEBUG true
-// Debug output - print memory contents
-#define DEBUG_MEM true
+#define DEBUG true      // Debug output
+#define DEBUG_MEM true  // Debug output - print memory contents
 
 int initRenderer(SDL_Window *window, SDL_Renderer **renderer);
 int initSDL(SDL_Window **window);
@@ -27,7 +25,6 @@ int main(int argc, char **argv)
         return 1;
     }
 
-
     // Initialize the chip and load a rom
     std::string fileName;
     if(argc > 1)
@@ -43,7 +40,7 @@ int main(int argc, char **argv)
     chip.loadRom(fileName);
 
     // Just to test out the drawscreen functionality
-    drawScreen(renderer, chip);
+    //drawScreen(renderer, chip);
 
     // Debug loop. Press a key to execute one cycle and then
     // dump the memory/cpu state.
@@ -67,11 +64,10 @@ int main(int argc, char **argv)
             // Update the screen if necessary
             if(chip.getDrawFlag() == true)
             {
-                // TODO
-                // draw to the screen
                 drawScreen(renderer, chip);
             }
 
+            // TODO: handle user input
             // Handle user input
         }
     }
@@ -115,13 +111,11 @@ int initRenderer(SDL_Window *window, SDL_Renderer **renderer)
 }
 
 /*
- * Render the Chip 8's screen to an SDL window
+ * Render the Chip 8's screen to an SDL window. Each chip8 pixel will be
+ * a 10x10 rectangle on the SDL window.
  */
 void drawScreen(SDL_Renderer *renderer, Chip8 chip)
 {
-    //TODO: implement drawing from the Chip8's screen array
-    // to the SDL surface. Make each pixel 10x10.
-
     //Clear the screen to black, then set drawing color back to white.
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderClear(renderer);
@@ -142,10 +136,8 @@ void drawScreen(SDL_Renderer *renderer, Chip8 chip)
 }
 
 /*
- * Draw one "chip8 pixel" which will be 10x10 pixels
- * in our SDL window.
- * "row" and "col" are in terms of the chip8 display,
- * not the SDL window.
+ * Draw one "chip8 pixel" which will be 10x10 pixels in our SDL window.
+ * "row" and "col" are in terms of the chip8 display, not the SDL window.
  *
  * Note: This function doesn't make the final "RenderPresent" call,
  * so if you want the pixel to show up on screen, you'll have to call
@@ -169,7 +161,7 @@ void drawPixel(SDL_Renderer *renderer, int row, int col)
 void Chip8::initialize()
 {
     std::cout << "Initializing the Chip 8 emulator." << std::endl;
-    pc = 0x200;     // Programs begin at location 0x200 (512)
+    pc = PC_START;     // Programs begin at location 0x200 (512)
     index_reg = 0;
     current_opcode = 0;
     sp = 0;
@@ -197,10 +189,40 @@ void Chip8::initialize()
     // TODO: implement the rest of this function
 }
 
+/*
+ * Copy the contents of the file into the ROM. The file can't contain more
+ * than (MEM_SIZE - PC_START) bytes.
+ */
 void Chip8::loadRom(std::string file_name)
 {
+    // Open the file
     std::cout << "Loading \"" << file_name << "\"..." << std::endl;
-    // TODO: implement this function
+    FILE* rom_file = fopen(file_name.c_str(), "rb");
+    if(rom_file == NULL)
+    {
+        perror("Error opening the ROM file");
+        return;
+    }
+
+    // Make sure it can fit in memory
+    fseek(rom_file, 0, SEEK_END);
+    int num_bytes = ftell(rom_file);
+    if(num_bytes >= (MEM_SIZE - PC_START))
+    {
+        printf("This file is too large to load into memory. ");
+        printf("File size: %d. Max allowed: %d.", num_bytes, MEM_SIZE-PC_START);
+        return;
+    }
+
+    // Copy the contents into memory byte-by-byte starting at PC_START
+    rewind(rom_file);
+    if(fread(memory, 1, num_bytes, rom_file) != num_bytes)
+    {
+        perror("Problem reading the ROM file");
+        return;
+    }
+
+    fclose(rom_file);
 }
 
 /*
