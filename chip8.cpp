@@ -12,8 +12,7 @@
 int initRenderer(SDL_Window *window, SDL_Renderer **renderer);
 int initSDL(SDL_Window **window);
 void drawScreen(SDL_Renderer *renderer, Chip8 chip);
-
-
+void drawPixel(SDL_Renderer *renderer, int row, int col);
 
 Chip8 chip;
 
@@ -27,7 +26,6 @@ int main(int argc, char **argv)
     {
         return 1;
     }
-    drawScreen(renderer, chip);
 
 
     // Initialize the chip and load a rom
@@ -43,6 +41,9 @@ int main(int argc, char **argv)
     }
     chip.initialize();
     chip.loadRom(fileName);
+
+    // Just to test out the drawscreen functionality
+    drawScreen(renderer, chip);
 
     // Debug loop. Press a key to execute one cycle and then
     // dump the memory/cpu state.
@@ -121,19 +122,44 @@ void drawScreen(SDL_Renderer *renderer, Chip8 chip)
     //TODO: implement drawing from the Chip8's screen array
     // to the SDL surface. Make each pixel 10x10.
 
-    //Clear the screen to black
+    //Clear the screen to black, then set drawing color back to white.
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderClear(renderer);
-
-    // Draw a white 10x10 rectangle
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+
+    // Draw a white 10x10 rectangle for each chip8 pixel that is '1'
+    for(int row=0; row<SCREEN_HEIGHT; row++)
+    {
+        for(int col=0; col<SCREEN_WIDTH; col++)
+        {
+            if(chip.screen[row][col] == 1)
+            {
+                drawPixel(renderer, row, col);
+            }
+        }
+    }
+    SDL_RenderPresent(renderer);
+}
+
+/*
+ * Draw one "chip8 pixel" which will be 10x10 pixels
+ * in our SDL window.
+ * "row" and "col" are in terms of the chip8 display,
+ * not the SDL window.
+ *
+ * Note: This function doesn't make the final "RenderPresent" call,
+ * so if you want the pixel to show up on screen, you'll have to call
+ * that yourself after you have drawn as many pixels as you want.
+ */
+void drawPixel(SDL_Renderer *renderer, int row, int col)
+{
+    printf("ROW: %d, COL %d\n", row, col);
     SDL_Rect r;
-    r.x=0;
-    r.y=0;
+    r.x=col*10;
+    r.y=row*10;
     r.w=10;
     r.h=10;
     SDL_RenderFillRect(renderer, &r);
-    SDL_RenderPresent(renderer);
 }
 
 /*
@@ -153,9 +179,20 @@ void Chip8::initialize()
     {
         for(int col=0; col<SCREEN_WIDTH; col++)
         {
-           screen[row][col] = 0;
+            screen[row][col] = 0;
         }
     }
+
+    // For the sake of testing the draw screen function without a working CPU
+    screen[0][0] = 1;
+    screen[0][SCREEN_WIDTH-1] = 1;
+    screen[SCREEN_HEIGHT-1][0] = 1;
+    screen[SCREEN_HEIGHT-1][SCREEN_WIDTH-1] = 1;
+    screen[2][2] = 1;
+    screen[4][4] = 1;
+    screen[6][6] = 1;
+    screen[8][8] = 1;
+    screen[10][10] = 1;
 
     // TODO: implement the rest of this function
 }
@@ -233,7 +270,6 @@ void Chip8::dumpState()
         printf("\n");
     }
 }
-
 
 
 

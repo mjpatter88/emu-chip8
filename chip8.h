@@ -36,13 +36,6 @@ class Chip8 {
          */
         unsigned short pc;
 
-        /*
-         * https://en.wikipedia.org/wiki/CHIP-8#Graphics_and_sound
-         * Display resolution of 64*32
-         * Each pixel is either on (1) or off (0)
-         */
-        unsigned char screen[SCREEN_HEIGHT][SCREEN_WIDTH];
-        //unsigned char screen[SCREEN_WIDTH * SCREEN_HEIGHT];
         
         /*
          * This timer runs at 60 hertz until it reaches 0.
@@ -79,4 +72,12 @@ class Chip8 {
         void setKeys();
         bool getDrawFlag();
         void dumpState();
+
+        /*
+         * https://en.wikipedia.org/wiki/CHIP-8#Graphics_and_sound
+         * Display resolution of 64*32
+         * Each pixel is either on (1) or off (0)
+         */
+        unsigned char screen[SCREEN_HEIGHT][SCREEN_WIDTH];
+        //unsigned char screen[SCREEN_WIDTH * SCREEN_HEIGHT];
 };
