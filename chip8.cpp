@@ -1,5 +1,7 @@
 #include <iostream>
+#include <string>
 #include <stdio.h>
+#include <SDL2/SDL.h>
 #include "chip8.h"
 
 // Debug output
@@ -7,17 +9,40 @@
 // Debug output - print memory contents
 #define DEBUG_MEM true
 
+int initRenderer(SDL_Window *window, SDL_Renderer **renderer);
+int initSDL(SDL_Window **window);
+void drawScreen(SDL_Renderer *renderer, Chip8 chip);
+
+
+
 Chip8 chip;
 
 int main(int argc, char **argv)
 {
     // TODO
     // Set up the graphics system and the input system.
-    // Use SDL for this?
+    SDL_Window *window;
+    SDL_Renderer *renderer;
+    if(initSDL(&window) != 0 || initRenderer(window, &renderer) != 0)
+    {
+        return 1;
+    }
+    drawScreen(renderer, chip);
+
 
     // Initialize the chip and load a rom
+    std::string fileName;
+    if(argc > 1)
+    {
+        fileName = argv[1];
+    }
+    else
+    {
+        fileName = "Test.ch8";
+        std::cout << "Using \"" << fileName <<"\" as ROM" << std::endl;
+    }
     chip.initialize();
-    chip.loadRom("Test.ch8");
+    chip.loadRom(fileName);
 
     // Debug loop. Press a key to execute one cycle and then
     // dump the memory/cpu state.
@@ -31,23 +56,85 @@ int main(int argc, char **argv)
             chip.dumpState();
         }
     }
-
-    // Main emulation loop
-    for(;;)
+    else
     {
-        chip.emulateCycle();
-
-        // Update the screen if necessary
-        if(chip.getDrawFlag() == true)
+        // Main emulation loop
+        for(;;)
         {
-            // TODO
-            // draw to the screen
-        }
+            chip.emulateCycle();
 
-        // Handle user input
+            // Update the screen if necessary
+            if(chip.getDrawFlag() == true)
+            {
+                // TODO
+                // draw to the screen
+                drawScreen(renderer, chip);
+            }
+
+            // Handle user input
+        }
+    }
+    
+    SDL_DestroyWindow(window);
+    SDL_Quit();
+    return 0;
+
+}
+
+int initSDL(SDL_Window **window)
+{
+    SDL_Init(SDL_INIT_VIDEO);
+    unsigned int flags = SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL;
+    *window = SDL_CreateWindow("Chip 8 Display", SDL_WINDOWPOS_UNDEFINED,
+                                SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH*10,
+                                SCREEN_HEIGHT*10, flags);
+    if(*window == NULL)
+    {
+        printf("Could not create SDL window: %s\n", SDL_GetError());
+        return 1;
+    }
+    else
+    {
+        return 0;
     }
 }
 
+int initRenderer(SDL_Window *window, SDL_Renderer **renderer)
+{
+    *renderer = SDL_CreateRenderer(window, 0, SDL_RENDERER_ACCELERATED);
+    if(*renderer == NULL)
+    {
+        printf("Could not create SDL renderer: %s\n", SDL_GetError());
+        return 1;
+    }
+    else
+    {
+        return 0;
+    }
+}
+
+/*
+ * Render the Chip 8's screen to an SDL window
+ */
+void drawScreen(SDL_Renderer *renderer, Chip8 chip)
+{
+    //TODO: implement drawing from the Chip8's screen array
+    // to the SDL surface. Make each pixel 10x10.
+
+    //Clear the screen to black
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    SDL_RenderClear(renderer);
+
+    // Draw a white 10x10 rectangle
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+    SDL_Rect r;
+    r.x=0;
+    r.y=0;
+    r.w=10;
+    r.h=10;
+    SDL_RenderFillRect(renderer, &r);
+    SDL_RenderPresent(renderer);
+}
 
 /*
  * Initialize the CPU by setting the pc to 0x200 and reseting
@@ -70,7 +157,7 @@ void Chip8::initialize()
         }
     }
 
-    // TODO: implement this function
+    // TODO: implement the rest of this function
 }
 
 void Chip8::loadRom(std::string file_name)

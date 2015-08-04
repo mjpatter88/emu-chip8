@@ -21,3 +21,8 @@ Development steps
 4) ROM file support.
 5) Graphical Display support.
 6) Input support.
+
+
+
+To install SDL2 on Ubuntu:
+"sudo apt-get install libsdl2-dev"
