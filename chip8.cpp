@@ -39,36 +39,61 @@ int main(int argc, char **argv)
     chip.initialize();
     chip.loadRom(fileName);
 
-    // Just to test out the drawscreen functionality
-    //drawScreen(renderer, chip);
+    // Emulation and SDL event loop
+    long count = 0;
+    bool user_quit = false;
+    bool new_cycle = false;
+    unsigned int start_ms = SDL_GetTicks();
+    while(!user_quit)
+    {
+        // Wait for an event or the time to draw the next frame
+        SDL_Event cur_event;
+        unsigned int time_remaining = 16 - (SDL_GetTicks()-start_ms);   //TODO: is this right? will it ever be negative?
+        int eventsAvailable = SDL_WaitEventTimeout(&cur_event, time_remaining);
 
-    // Debug loop. Press a key to execute one cycle and then
-    // dump the memory/cpu state.
-    if(DEBUG)
-    {
-        chip.dumpState();
-        for(;;)
+        // Handle SDL events
+        while(eventsAvailable)
         {
-            getchar();
-            chip.emulateCycle();
-            chip.dumpState();
+            switch(cur_event.type)
+            {
+                case SDL_QUIT:
+                    user_quit = true;
+                    break;
+                default:
+                    //printf("Unhandled event\n");
+                    break;
+            }
+            eventsAvailable = SDL_PollEvent(&cur_event);
+        } 
+
+        // Give input to the emulator
+        // TODO: key presses to emulator
+
+        // check if it's time for a new cpu cycle.
+        // 60 Mhz -> One cycle every 16.66666666 milliseconds
+        if((SDL_GetTicks()-start_ms) >= 16)
+        {
+            start_ms = SDL_GetTicks();
+            new_cycle = true;
         }
-    }
-    else
-    {
-        // Main emulation loop
-        for(;;)
+
+        // Run the next emulation cycle if it's time for a new cycle
+        if(new_cycle)
         {
+            if(count % 60 == 0)
+            {
+                std::cout << "Cycle " << count << std::endl;
+            }
             chip.emulateCycle();
+            count++;
+            new_cycle = false;
 
             // Update the screen if necessary
+            // drawScreen(renderer, chip);
             if(chip.getDrawFlag() == true)
             {
                 drawScreen(renderer, chip);
             }
-
-            // TODO: handle user input
-            // Handle user input
         }
     }
     
@@ -145,7 +170,7 @@ void drawScreen(SDL_Renderer *renderer, Chip8 chip)
  */
 void drawPixel(SDL_Renderer *renderer, int row, int col)
 {
-    printf("ROW: %d, COL %d\n", row, col);
+    //printf("ROW: %d, COL %d\n", row, col);
     SDL_Rect r;
     r.x=col*10;
     r.y=row*10;
@@ -230,7 +255,7 @@ void Chip8::loadRom(std::string file_name)
  */
 void Chip8::emulateCycle()
 {
-    std::cout << "Emulating cycle..." << std::endl;
+    //std::cout << "Emulating cycle..." << std::endl;
 
     // Fetch the opcode (two bytes, from "pc" location)
     current_opcode = memory[pc] << 8 | memory[pc+1];
