@@ -5,6 +5,7 @@
 #define NUM_REG 16
 #define MEM_SIZE 4096
 #define PC_START 0x200
+#define FREQ  60
 
 class Chip8 {
     private:

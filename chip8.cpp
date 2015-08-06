@@ -11,6 +11,7 @@ int initRenderer(SDL_Window *window, SDL_Renderer **renderer);
 int initSDL(SDL_Window **window);
 void drawScreen(SDL_Renderer *renderer, Chip8 chip);
 void drawPixel(SDL_Renderer *renderer, int row, int col);
+unsigned int cycleCallback(unsigned int interval, void *param);
 
 Chip8 chip;
 
@@ -39,63 +40,40 @@ int main(int argc, char **argv)
     chip.initialize();
     chip.loadRom(fileName);
 
-    // Emulation and SDL event loop
+    // Emulation and SDL event loop flags
     long count = 0;
     bool user_quit = false;
-    bool new_cycle = false;
-    unsigned int start_ms = SDL_GetTicks();
-    while(!user_quit)
+    bool draw = true;//TODO: remvove this variable once the cpu implements the drawFlag appropriately
+
+    // Set a new timer for the next cycle
+    unsigned int interval = 1000/FREQ;
+    SDL_TimerID tid = SDL_AddTimer(17, cycleCallback, NULL);
+
+    SDL_Event cur_event;
+    // Handle SDL events
+    while(!user_quit && SDL_WaitEvent(&cur_event))
     {
-        // Wait for an event or the time to draw the next frame
-        SDL_Event cur_event;
-        unsigned int time_remaining = 16 - (SDL_GetTicks()-start_ms);   //TODO: is this right? will it ever be negative?
-        int eventsAvailable = SDL_WaitEventTimeout(&cur_event, time_remaining);
-
-        // Handle SDL events
-        while(eventsAvailable)
+        switch(cur_event.type)
         {
-            switch(cur_event.type)
-            {
-                case SDL_QUIT:
-                    user_quit = true;
-                    break;
-                default:
-                    //printf("Unhandled event\n");
-                    break;
-            }
-            eventsAvailable = SDL_PollEvent(&cur_event);
-        } 
-
-        // Give input to the emulator
-        // TODO: key presses to emulator
-
-        // check if it's time for a new cpu cycle.
-        // 60 Mhz -> One cycle every 16.66666666 milliseconds
-        if((SDL_GetTicks()-start_ms) >= 16)
-        {
-            start_ms = SDL_GetTicks();
-            new_cycle = true;
+            case SDL_QUIT:
+                user_quit = true;
+                break;
+            case SDL_USEREVENT:
+                // Give input to the emulator
+                // TODO: key presses to emulator
+                if(count % 60 ==0) std::cout << "Cycle " << count << std::endl;
+                chip.emulateCycle();
+                if(draw) drawScreen(renderer, chip);
+                count++;
+                draw = false;
+                break;
+            default:
+                //printf("Unhandled event\n");
+                break;
         }
+    } 
 
-        // Run the next emulation cycle if it's time for a new cycle
-        if(new_cycle)
-        {
-            if(count % 60 == 0)
-            {
-                std::cout << "Cycle " << count << std::endl;
-            }
-            chip.emulateCycle();
-            count++;
-            new_cycle = false;
 
-            // Update the screen if necessary
-            // drawScreen(renderer, chip);
-            if(chip.getDrawFlag() == true)
-            {
-                drawScreen(renderer, chip);
-            }
-        }
-    }
     
     SDL_DestroyWindow(window);
     SDL_Quit();
@@ -103,9 +81,17 @@ int main(int argc, char **argv)
 
 }
 
+unsigned int cycleCallback(unsigned int interval, void *param)
+{
+    SDL_Event event;
+    event.type = SDL_USEREVENT;
+    SDL_PushEvent(&event);
+    return(interval);
+}
+
 int initSDL(SDL_Window **window)
 {
-    SDL_Init(SDL_INIT_VIDEO);
+    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER);
     unsigned int flags = SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL;
     *window = SDL_CreateWindow("Chip 8 Display", SDL_WINDOWPOS_UNDEFINED,
                                 SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH*10,
@@ -123,7 +109,7 @@ int initSDL(SDL_Window **window)
 
 int initRenderer(SDL_Window *window, SDL_Renderer **renderer)
 {
-    *renderer = SDL_CreateRenderer(window, 0, SDL_RENDERER_ACCELERATED);
+    *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     if(*renderer == NULL)
     {
         printf("Could not create SDL renderer: %s\n", SDL_GetError());
