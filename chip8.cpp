@@ -17,8 +17,7 @@ Chip8 chip;
 
 int main(int argc, char **argv)
 {
-    // TODO
-    // Set up the graphics system and the input system.
+    // Set up the graphics system and the input system (SDL).
     SDL_Window *window;
     SDL_Renderer *renderer;
     if(initSDL(&window) != 0 || initRenderer(window, &renderer) != 0)
@@ -71,8 +70,6 @@ int main(int argc, char **argv)
                 break;
         }
     } 
-
-
     
     SDL_DestroyWindow(window);
     SDL_Quit();
@@ -250,14 +247,63 @@ void Chip8::loadRom(std::string file_name)
  */
 void Chip8::emulateCycle()
 {
-    //std::cout << "Emulating cycle..." << std::endl;
-
     // Fetch the opcode (two bytes, from "pc" location)
     current_opcode = memory[pc] << 8 | memory[pc+1];
     
-    // Decode the opcode
+    // Decode and execute the opcode
+    // https://en.wikipedia.org/wiki/CHIP-8#Opcode_table
+    switch(current_opcode & 0xF000)
+    {
+        case 0x0000:
+            switch(current_opcode & 0x000F)
+            {
+                case 0x0000:
+                    // 00E0 "Clears the screen."
+                    break;
+                case 0x000E:
+                    // 00EE "Returns from a subroutine."
+                    break;
+                default:
+                    // 0NNN "Calls RCA 1802 program at address NNN. Not necessary for most ROMs."
+                    break;
+            }
+            break;
+        case 0x1000:
+            break;
+        case 0x2000:
+            break;
+        case 0x3000:
+            break;
+        case 0x4000:
+            break;
+        case 0x5000:
+            break;
+        case 0x6000:
+            break;
+        case 0x7000:
+            break;
+        case 0x8000:
+            break;
+        case 0x9000:
+            break;
+        case 0xA000:
+            break;
+        case 0xB000:
+            break;
+        case 0xC000:
+            break;
+        case 0xD000:
+            break;
+        case 0xE000:
+            break;
+        case 0xF000:
+            break;
+        default:
+            std::cout << "Unknown instruction: " << current_opcode << std::endl;
+            break;
 
-    // Executre the opcode (and update "pc")
+    }
+    // Update the pc accordingly
 
     // Update timers
 }
