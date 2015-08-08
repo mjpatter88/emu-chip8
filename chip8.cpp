@@ -46,8 +46,7 @@ int main(int argc, char **argv)
     bool draw = true;//TODO: remvove this variable once the cpu implements the drawFlag appropriately
 
     // Set a new timer for the next cycle
-    unsigned int interval = 1000/FREQ;
-    SDL_TimerID tid = SDL_AddTimer(17, cycleCallback, NULL);
+    SDL_TimerID tid = SDL_AddTimer((1000/FREQ), cycleCallback, NULL);
 
     SDL_Event cur_event;
     // Handle SDL events
@@ -81,6 +80,10 @@ int main(int argc, char **argv)
 
 }
 
+/*
+ * This function gets called by the SDL_Timer 60 times per second. It is used to add events
+ * to the SDL event system to make the cpu run at the proper frequency.
+ */
 unsigned int cycleCallback(unsigned int interval, void *param)
 {
     SDL_Event event;
@@ -89,10 +92,13 @@ unsigned int cycleCallback(unsigned int interval, void *param)
     return(interval);
 }
 
+/*
+ * Initialize the necessary SDL systems and create the window.
+ */
 int initSDL(SDL_Window **window)
 {
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER);
-    unsigned int flags = SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL;
+    unsigned int flags = 0; //It seems that we don't need any flags here.
     *window = SDL_CreateWindow("Chip 8 Display", SDL_WINDOWPOS_UNDEFINED,
                                 SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH*10,
                                 SCREEN_HEIGHT*10, flags);
@@ -107,6 +113,9 @@ int initSDL(SDL_Window **window)
     }
 }
 
+/*
+ * Initialize the SDL renderer for the given window.
+ */
 int initRenderer(SDL_Window *window, SDL_Renderer **renderer)
 {
     *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
@@ -253,6 +262,9 @@ void Chip8::emulateCycle()
     // Update timers
 }
 
+/*
+ * Returns the chip8's draw_flag.
+ */
 bool Chip8::getDrawFlag()
 {
     return draw_flag;
