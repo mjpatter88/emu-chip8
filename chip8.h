@@ -67,6 +67,11 @@ class Chip8 {
          */
         bool draw_flag;
 
+        /*
+         * Utility function to clear the chip8's screen.
+         */
+        bool clearScreen();
+
     public:
         void initialize();
         void loadRom(std::string file_name);

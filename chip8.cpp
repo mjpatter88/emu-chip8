@@ -61,7 +61,7 @@ int main(int argc, char **argv)
                 // TODO: key presses to emulator
                 if(count % 60 ==0) std::cout << "Cycle " << count << std::endl;
                 chip.emulateCycle();
-                if(draw) drawScreen(renderer, chip);
+                if(draw || chip.getDrawFlag()) drawScreen(renderer, chip);
                 count++;
                 draw = false;
                 break;
@@ -184,13 +184,7 @@ void Chip8::initialize()
     sp = 0;
 
     //Blank screen to start
-    for(int row=0; row<SCREEN_HEIGHT; row++)
-    {
-        for(int col=0; col<SCREEN_WIDTH; col++)
-        {
-            screen[row][col] = 0;
-        }
-    }
+    clearScreen();
 
     // For the sake of testing the draw screen function without a working CPU
     screen[0][0] = 1;
@@ -250,62 +244,191 @@ void Chip8::emulateCycle()
     // Fetch the opcode (two bytes, from "pc" location)
     current_opcode = memory[pc] << 8 | memory[pc+1];
     
+    //We don't need to draw unless 0x00E0 or 0xDXYN are executed.
+    draw_flag = 0;
+
     // Decode and execute the opcode
     // https://en.wikipedia.org/wiki/CHIP-8#Opcode_table
     switch(current_opcode & 0xF000)
     {
         case 0x0000:
-            switch(current_opcode & 0x000F)
+            switch(current_opcode & 0x00FF)
             {
-                case 0x0000:
+                case 0x00E0:
                     // 00E0 "Clears the screen."
+                    clearScreen();
+                    draw_flag = 1;
+                    pc = pc + 2;
                     break;
-                case 0x000E:
+                case 0x00EE:
                     // 00EE "Returns from a subroutine."
+                    // TODO
                     break;
                 default:
                     // 0NNN "Calls RCA 1802 program at address NNN. Not necessary for most ROMs."
+                    // TODO
                     break;
             }
             break;
         case 0x1000:
+            // 1NNN "Jumps to address NNN."
+            // TODO
             break;
         case 0x2000:
+            // 2NNN "Calls subroutine at NNN."
+            // TODO
             break;
         case 0x3000:
+            // 3XNN "Skips the next instruction if VX equals NN."
+            // TODO
             break;
         case 0x4000:
+            // 4XNN "Skips the next instruction if VX doesn't equal NN."
+            // TODO
             break;
         case 0x5000:
+            // 5XY0 "Skips the next instruction if VX equals VY."
+            // TODO
             break;
         case 0x6000:
+            // 6XNN "Set VX to NN."
+            // TODO
             break;
         case 0x7000:
+            // 7XNN "Adds NN to VX."
+            // TODO
             break;
         case 0x8000:
+            switch(current_opcode & 0x000F)
+            {
+                case 0x0000:
+                    // 8XY0 "Sets VX to the value of VY."
+                    // TODO
+                    break;
+                case 0x0001:
+                    // 8XY1 "Sets VX to VX OR VY."
+                    // TODO
+                    break;
+                case 0x0002:
+                    // 8XY2 "Sets VX to VX AND VY."
+                    // TODO
+                    break;
+                case 0x0003:
+                    // 8XY3 ""Sets VX to VX XOR VY.
+                    // TODO
+                    break;
+                case 0x0004:
+                    // 8XY4 "Adds VY to VX. VF is set to 1 if there is a carry, 0 otherwise."
+                    // TODO
+                    break;
+                case 0x0005:
+                    // 8XY5 "VY is subtracted fro VX. VF is set to 0 if there is a borrow, 1 otherwise."
+                    // TODO
+                    break;
+                case 0x0006:
+                    // 8XY6 "Shifts VX right by one. VF is set to the value of the LSB of VX before the shift."
+                    // TODO
+                    break;
+                case 0x0007:
+                    // 8XY7 "Sets VX to VY minux VX. VF is set to 0 if there is a borrow, 1 otherwise."
+                    // TODO
+                    break;
+                case 0x000E:
+                    // 8XYE "Shift VX left by one. VF is set to the value of the MSB of VX before the shift."
+                    // TODO
+                    break;
+                default:
+                    std::cout << "Unknown instruction: " << current_opcode << std::endl;
+                    break;
+            }
             break;
         case 0x9000:
+            // 9XY0 "Skips the next instruction if VX doesn't equal VY."
+            // TODO
             break;
         case 0xA000:
+            // ANNN "Sets I to the address NNN."
+            // TODO
             break;
         case 0xB000:
+            // BNNN "Jumps to the address NNN plus V0."
+            // TODO
             break;
         case 0xC000:
+            // CXNN "Sets VX to the result of a bitwise AND operation on a random number and NN."
+            // TODO
             break;
         case 0xD000:
+            // DXYN "Draw a sprite at position VX, VY with N bytes of sprite data starting at the address stored in I."
+            // TODO
             break;
         case 0xE000:
+            switch(current_opcode & 0x00FF)
+            {
+                case 0x009E:
+                    // EX9E "Skips the next instruction if the key stored in VX is pressed."
+                    // TODO
+                    break;
+                case 0x00A1:
+                    // EXA1 "Skips the next instruction if the key stored in VX isn't pressed."
+                    // TODO
+                    break;
+                default:
+                    std::cout << "Unknown instruction: " << current_opcode << std::endl;
+                    break;
+            }
             break;
         case 0xF000:
+            switch(current_opcode & 0x0FF)
+            {
+                case 0x0007:
+                    // FX07 "Sets VX to the value of the delay timer.
+                    // TODO
+                    break;
+                case 0x000A:
+                    // FX0A "A key press is awaited and then stored in VX."
+                    // TODO
+                    break;
+                case 0x0015:
+                    // FX15 "Sets the delay timer to VX."
+                    // TODO
+                    break;
+                case 0x0018:
+                    // FX18 "Sets the sound timer to VX."
+                    // TODO
+                    break;
+                case 0x001E:
+                    // FX1E "Adds VX to I."
+                    // TODO
+                    break;
+                case 0x0029:
+                    // FX29 "Sets I to the location of the sprite for the character in VX.
+                    // TODO
+                    break;
+                case 0x0033:
+                    // FX33 "Store the binary-coded decimal equivalent of the value stored in register VX at addresses I, I+1, and I+2."
+                    // TODO
+                    break;
+                case 0x0055:
+                    // FX55 "Stores V0 to VX in memory starting at address I."
+                    // TODO
+                    break;
+                case 0x0065:
+                    // FX65 "Fills V0 to VX with values from memory starting at address I."
+                    // TODO
+                    break;
+                default:
+                    std::cout << "Unknown instruction: " << current_opcode << std::endl;
+                    break;
+            }
             break;
         default:
             std::cout << "Unknown instruction: " << current_opcode << std::endl;
             break;
 
     }
-    // Update the pc accordingly
-
     // Update timers
+
 }
 
 /*
@@ -314,6 +437,20 @@ void Chip8::emulateCycle()
 bool Chip8::getDrawFlag()
 {
     return draw_flag;
+}
+
+/*
+ * Clears the chip8's screen.
+ */
+bool Chip8::clearScreen()
+{
+    for(int row=0; row<SCREEN_HEIGHT; row++)
+    {
+        for(int col=0; col<SCREEN_WIDTH; col++)
+        {
+            screen[row][col] = 0;
+        }
+    }
 }
 
 /*

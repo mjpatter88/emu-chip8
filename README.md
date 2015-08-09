@@ -30,3 +30,11 @@ Development steps
 
 To install SDL2 on Ubuntu:
 "sudo apt-get install libsdl2-dev"
+
+
+Links:
+http://www.multigesture.net/articles/how-to-write-an-emulator-chip-8-interpreter/
+https://en.wikipedia.org/wiki/CHIP-8
+http://mattmik.com/chip8.html
+http://devernay.free.fr/hacks/chip8/chip8def.htm
+http://emulator101.com/chip-8-instruction-set/
