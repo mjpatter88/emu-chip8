@@ -4,14 +4,14 @@
 
 
 ### TODO ###
-1) **DONE**: Input a filename to use as a ROM.
-2) **DONE**: Read from the ROM and correctly initialize memory.
-3) **DONE**: Keep count on cycles and only run at 60 mhz.
-4) Implement each opcode
-5) **DONE**: Draw screen using SDL
-6) Handle input using SDL
-7) Add sample ROMs and include a link.
-8) Add the "fontset" functionality.
+1. **DONE**: Input a filename to use as a ROM.
+2. **DONE**: Read from the ROM and correctly initialize memory.
+3. **DONE**: Keep count on cycles and only run at 60 mhz.
+4. Implement each opcode
+5. **DONE**: Draw screen using SDL
+6. Handle input using SDL
+7. Add sample ROMs and include a link.
+8. Add the "fontset" functionality.
 
 
 
@@ -28,7 +28,7 @@
 8. Input support.
 
 
-To install SDL2 on Ubuntu:
+To install SDL2 on Ubuntu: <br>
 "sudo apt-get install libsdl2-dev"
 
 
