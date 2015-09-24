@@ -20,19 +20,16 @@ int main(int argc, char **argv)
     // Set up the graphics system and the input system (SDL).
     SDL_Window *window;
     SDL_Renderer *renderer;
-    if(initSDL(&window) != 0 || initRenderer(window, &renderer) != 0)
-    {
+    if(initSDL(&window) != 0 || initRenderer(window, &renderer) != 0) {
         return 1;
     }
 
     // Initialize the chip and load a rom
     std::string fileName;
-    if(argc > 1)
-    {
+    if(argc > 1) {
         fileName = argv[1];
     }
-    else
-    {
+    else {
         fileName = "Test.ch8";
         std::cout << "Using \"" << fileName <<"\" as ROM" << std::endl;
     }
@@ -49,19 +46,21 @@ int main(int argc, char **argv)
 
     SDL_Event cur_event;
     // Handle SDL events
-    while(!user_quit && SDL_WaitEvent(&cur_event))
-    {
-        switch(cur_event.type)
-        {
+    while(!user_quit && SDL_WaitEvent(&cur_event)) {
+        switch(cur_event.type) {
             case SDL_QUIT:
                 user_quit = true;
                 break;
             case SDL_USEREVENT:
                 // Give input to the emulator
                 // TODO: key presses to emulator
-                if(count % 60 ==0) std::cout << "Cycle " << count << std::endl;
+                if(count % 60 ==0) {
+                    std::cout << "Cycle " << count << std::endl;
+                }
                 chip.emulateCycle();
-                if(draw || chip.getDrawFlag()) drawScreen(renderer, chip);
+                if(draw || chip.getDrawFlag()) {
+                    drawScreen(renderer, chip);
+                }
                 count++;
                 draw = false;
                 break;
@@ -74,7 +73,6 @@ int main(int argc, char **argv)
     SDL_DestroyWindow(window);
     SDL_Quit();
     return 0;
-
 }
 
 /*
@@ -99,13 +97,11 @@ int initSDL(SDL_Window **window)
     *window = SDL_CreateWindow("Chip 8 Display", SDL_WINDOWPOS_UNDEFINED,
                                 SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH*10,
                                 SCREEN_HEIGHT*10, flags);
-    if(*window == NULL)
-    {
+    if(*window == NULL) {
         printf("Could not create SDL window: %s\n", SDL_GetError());
         return 1;
     }
-    else
-    {
+    else {
         return 0;
     }
 }
@@ -116,13 +112,11 @@ int initSDL(SDL_Window **window)
 int initRenderer(SDL_Window *window, SDL_Renderer **renderer)
 {
     *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-    if(*renderer == NULL)
-    {
+    if(*renderer == NULL) {
         printf("Could not create SDL renderer: %s\n", SDL_GetError());
         return 1;
     }
-    else
-    {
+    else {
         return 0;
     }
 }
@@ -139,12 +133,9 @@ void drawScreen(SDL_Renderer *renderer, Chip8 chip)
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 
     // Draw a white 10x10 rectangle for each chip8 pixel that is '1'
-    for(int row=0; row<SCREEN_HEIGHT; row++)
-    {
-        for(int col=0; col<SCREEN_WIDTH; col++)
-        {
-            if(chip.screen[row][col] == 1)
-            {
+    for(int row=0; row<SCREEN_HEIGHT; row++) {
+        for(int col=0; col<SCREEN_WIDTH; col++) {
+            if(chip.screen[row][col] == 1) {
                 drawPixel(renderer, row, col);
             }
         }
@@ -186,6 +177,7 @@ void Chip8::initialize()
     //Blank screen to start
     clearScreen();
 
+
     // For the sake of testing the draw screen function without a working CPU
     screen[0][0] = 1;
     screen[0][SCREEN_WIDTH-1] = 1;
@@ -209,8 +201,7 @@ void Chip8::loadRom(std::string file_name)
     // Open the file
     std::cout << "Loading \"" << file_name << "\"..." << std::endl;
     FILE* rom_file = fopen(file_name.c_str(), "rb");
-    if(rom_file == NULL)
-    {
+    if(rom_file == NULL) {
         perror("Error opening the ROM file");
         return;
     }
@@ -218,8 +209,7 @@ void Chip8::loadRom(std::string file_name)
     // Make sure it can fit in memory
     fseek(rom_file, 0, SEEK_END);
     int num_bytes = ftell(rom_file);
-    if(num_bytes >= (MEM_SIZE - PC_START))
-    {
+    if(num_bytes >= (MEM_SIZE - PC_START)) {
         printf("This file is too large to load into memory. ");
         printf("File size: %d. Max allowed: %d.", num_bytes, MEM_SIZE-PC_START);
         return;
@@ -227,8 +217,7 @@ void Chip8::loadRom(std::string file_name)
 
     // Copy the contents into memory byte-by-byte starting at PC_START
     rewind(rom_file);
-    if(fread(memory, 1, num_bytes, rom_file) != num_bytes)
-    {
+    if(fread(memory, 1, num_bytes, rom_file) != num_bytes) {
         perror("Problem reading the ROM file");
         return;
     }
@@ -425,7 +414,6 @@ void Chip8::emulateCycle()
         default:
             std::cout << "Unknown instruction: " << current_opcode << std::endl;
             break;
-
     }
     // Update timers
 
@@ -444,10 +432,8 @@ bool Chip8::getDrawFlag()
  */
 bool Chip8::clearScreen()
 {
-    for(int row=0; row<SCREEN_HEIGHT; row++)
-    {
-        for(int col=0; col<SCREEN_WIDTH; col++)
-        {
+    for(int row=0; row<SCREEN_HEIGHT; row++) {
+        for(int col=0; col<SCREEN_WIDTH; col++) {
             screen[row][col] = 0;
         }
     }
@@ -464,21 +450,16 @@ void Chip8::dumpState()
     //TODO print cycle count
     printf("PC: 0x%X\t%d\n", pc, pc);
     printf("Opcode: 0x%X\n", current_opcode);
-    for(int i=0; i<NUM_REG; i++)
-    {
+    for(int i=0; i<NUM_REG; i++) {
         printf("V%d: 0x%X\n", i, v_registers[i]);
     }
 
     //TODO: optionally dump memory to a file?
-    if(DEBUG_MEM)
-    {
+    if(DEBUG_MEM) {
         printf("********** Memory Contents **********\n");
-        for(int i=0; i<MEM_SIZE; i+=2)
-        {
-            if(i%32 == 0)
-            {
-                if(i!=0)
-                {
+        for(int i=0; i<MEM_SIZE; i+=2) {
+            if(i%32 == 0) {
+                if(i!=0) {
                     printf("\n");
                 }
                 printf("%03X (%04d): ", i, i);
@@ -489,10 +470,8 @@ void Chip8::dumpState()
     }
 
     printf("********** Screen Contents **********\n");
-    for(int row=0; row<SCREEN_HEIGHT; row++)
-    {
-        for(int col=0; col<SCREEN_WIDTH; col++)
-        {
+    for(int row=0; row<SCREEN_HEIGHT; row++) {
+        for(int col=0; col<SCREEN_WIDTH; col++) {
             printf("%d", screen[row][col]);
         }
         printf("\n");
@@ -500,6 +479,9 @@ void Chip8::dumpState()
 }
 
 
+void Chip8::unsupportedOpcode(unsigned short opcode, unsigned short pc)
+{
+}
 
 
 

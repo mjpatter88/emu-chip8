@@ -72,6 +72,11 @@ class Chip8 {
          */
         bool clearScreen();
 
+        /*
+         * Utility function that gets called whenever an unsupported opcode is encountered.
+         */
+        void unsupportedOpcode(unsigned short opcode, unsigned short pc);
+
     public:
         void initialize();
         void loadRom(std::string file_name);
