@@ -1,4 +1,13 @@
+#ifndef CHIP8_H
+#define CHIP8_H
+
+
+
+
 #include <string>
+
+#define DEBUG true      // Debug output
+#define DEBUG_MEM true  // Debug output - print memory contents
 
 #define SCREEN_WIDTH 64
 #define SCREEN_HEIGHT 32
@@ -8,7 +17,7 @@
 #define FREQ  60
 
 class Chip8 {
-    private:
+    protected:
         /*
          * http://en.wikipedia.org/wiki/CHIP-8#Opcode_table
          * 35 possible opcodes, all 2 bytes long
@@ -93,3 +102,5 @@ class Chip8 {
         unsigned char screen[SCREEN_HEIGHT][SCREEN_WIDTH];
         //unsigned char screen[SCREEN_WIDTH * SCREEN_HEIGHT];
 };
+
+#endif // !CHIP8_
