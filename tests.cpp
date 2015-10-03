@@ -18,6 +18,18 @@ void Chip8Tester::runTests() {
 }
 
 bool Chip8Tester::testClearScreen() {
+	bool success = true;
 
-	return false;
+	screen[5][5] = 1;
+	screen[10][10] = 1;
+	clearScreen();
+    for(int row=0; row<SCREEN_HEIGHT; row++) {
+        for(int col=0; col<SCREEN_WIDTH; col++) {
+			if (screen[row][col] != 0) {
+				success = false;
+			}
+        }
+    }
+
+	return success;
 }
