@@ -1,3 +1,15 @@
+# VIM .swp files
+*.swp
+
+# VS 2015 files
+*.suo
+*.ilk
+*.log
+*.pdb
+*.sdf
+*.opensdf
+[Dd]ebug/
+
 # Compiled Object files
 *.slo
 *.lo

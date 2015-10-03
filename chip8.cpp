@@ -1,7 +1,14 @@
+#ifdef _WIN32
+	#define _CRT_SECURE_NO_DEPRECATE
+	#include <SDL.h>
+#else
+	#include <SDL2/SDL.h>
+#endif
+
+
 #include <iostream>
 #include <string>
 #include <stdio.h>
-#include <SDL2/SDL.h>
 #include "chip8.h"
 
 #define DEBUG true      // Debug output
@@ -72,6 +79,11 @@ int main(int argc, char **argv)
     
     SDL_DestroyWindow(window);
     SDL_Quit();
+
+	if (DEBUG) {
+		printf("\n\n\n\n\nPress any key to exit...");
+		getchar();
+	}
     return 0;
 }
 
@@ -179,15 +191,15 @@ void Chip8::initialize()
 
 
     // For the sake of testing the draw screen function without a working CPU
-    screen[0][0] = 1;
-    screen[0][SCREEN_WIDTH-1] = 1;
-    screen[SCREEN_HEIGHT-1][0] = 1;
-    screen[SCREEN_HEIGHT-1][SCREEN_WIDTH-1] = 1;
-    screen[2][2] = 1;
-    screen[4][4] = 1;
-    screen[6][6] = 1;
-    screen[8][8] = 1;
-    screen[10][10] = 1;
+    //screen[0][0] = 1;
+    //screen[0][SCREEN_WIDTH-1] = 1;
+    //screen[SCREEN_HEIGHT-1][0] = 1;
+    //screen[SCREEN_HEIGHT-1][SCREEN_WIDTH-1] = 1;
+    //screen[2][2] = 1;
+    //screen[4][4] = 1;
+    //screen[6][6] = 1;
+    //screen[8][8] = 1;
+    //screen[10][10] = 1;
 
     // TODO: implement the rest of this function
 }
@@ -217,7 +229,7 @@ void Chip8::loadRom(std::string file_name)
 
     // Copy the contents into memory byte-by-byte starting at PC_START
     rewind(rom_file);
-    if(fread(memory, 1, num_bytes, rom_file) != num_bytes) {
+    if(fread(&memory[PC_START], 1, num_bytes, rom_file) != num_bytes) {
         perror("Problem reading the ROM file");
         return;
     }
@@ -237,7 +249,7 @@ void Chip8::emulateCycle()
     draw_flag = 0;
 
     // Decode and execute the opcode
-    // https://en.wikipedia.org/wiki/CHIP-8#Opcode_table
+    // "https://en.wikipedia.org/wiki/CHIP-8#Opcode_table"
     switch(current_opcode & 0xF000)
     {
         case 0x0000:
@@ -252,40 +264,49 @@ void Chip8::emulateCycle()
                 case 0x00EE:
                     // 00EE "Returns from a subroutine."
                     // TODO
+					Chip8::unsupportedOpcode(current_opcode, pc);
                     break;
                 default:
                     // 0NNN "Calls RCA 1802 program at address NNN. Not necessary for most ROMs."
                     // TODO
+					Chip8::unsupportedOpcode(current_opcode, pc);
                     break;
             }
             break;
         case 0x1000:
             // 1NNN "Jumps to address NNN."
             // TODO
+			Chip8::unsupportedOpcode(current_opcode, pc);
             break;
         case 0x2000:
             // 2NNN "Calls subroutine at NNN."
             // TODO
+			Chip8::unsupportedOpcode(current_opcode, pc);
             break;
         case 0x3000:
             // 3XNN "Skips the next instruction if VX equals NN."
             // TODO
+			Chip8::unsupportedOpcode(current_opcode, pc);
             break;
         case 0x4000:
             // 4XNN "Skips the next instruction if VX doesn't equal NN."
             // TODO
+			Chip8::unsupportedOpcode(current_opcode, pc);
             break;
         case 0x5000:
             // 5XY0 "Skips the next instruction if VX equals VY."
             // TODO
+			Chip8::unsupportedOpcode(current_opcode, pc);
             break;
         case 0x6000:
             // 6XNN "Set VX to NN."
             // TODO
+			Chip8::unsupportedOpcode(current_opcode, pc);
             break;
         case 0x7000:
             // 7XNN "Adds NN to VX."
             // TODO
+			Chip8::unsupportedOpcode(current_opcode, pc);
             break;
         case 0x8000:
             switch(current_opcode & 0x000F)
@@ -293,38 +314,47 @@ void Chip8::emulateCycle()
                 case 0x0000:
                     // 8XY0 "Sets VX to the value of VY."
                     // TODO
+					Chip8::unsupportedOpcode(current_opcode, pc);
                     break;
                 case 0x0001:
                     // 8XY1 "Sets VX to VX OR VY."
                     // TODO
+					Chip8::unsupportedOpcode(current_opcode, pc);
                     break;
                 case 0x0002:
                     // 8XY2 "Sets VX to VX AND VY."
                     // TODO
+					Chip8::unsupportedOpcode(current_opcode, pc);
                     break;
                 case 0x0003:
                     // 8XY3 ""Sets VX to VX XOR VY.
                     // TODO
+					Chip8::unsupportedOpcode(current_opcode, pc);
                     break;
                 case 0x0004:
                     // 8XY4 "Adds VY to VX. VF is set to 1 if there is a carry, 0 otherwise."
                     // TODO
+					Chip8::unsupportedOpcode(current_opcode, pc);
                     break;
                 case 0x0005:
                     // 8XY5 "VY is subtracted fro VX. VF is set to 0 if there is a borrow, 1 otherwise."
                     // TODO
+					Chip8::unsupportedOpcode(current_opcode, pc);
                     break;
                 case 0x0006:
                     // 8XY6 "Shifts VX right by one. VF is set to the value of the LSB of VX before the shift."
                     // TODO
+					Chip8::unsupportedOpcode(current_opcode, pc);
                     break;
                 case 0x0007:
                     // 8XY7 "Sets VX to VY minux VX. VF is set to 0 if there is a borrow, 1 otherwise."
                     // TODO
+					Chip8::unsupportedOpcode(current_opcode, pc);
                     break;
                 case 0x000E:
                     // 8XYE "Shift VX left by one. VF is set to the value of the MSB of VX before the shift."
                     // TODO
+					Chip8::unsupportedOpcode(current_opcode, pc);
                     break;
                 default:
                     std::cout << "Unknown instruction: " << current_opcode << std::endl;
@@ -334,22 +364,27 @@ void Chip8::emulateCycle()
         case 0x9000:
             // 9XY0 "Skips the next instruction if VX doesn't equal VY."
             // TODO
+			Chip8::unsupportedOpcode(current_opcode, pc);
             break;
         case 0xA000:
             // ANNN "Sets I to the address NNN."
             // TODO
+			Chip8::unsupportedOpcode(current_opcode, pc);
             break;
         case 0xB000:
             // BNNN "Jumps to the address NNN plus V0."
             // TODO
+			Chip8::unsupportedOpcode(current_opcode, pc);
             break;
         case 0xC000:
             // CXNN "Sets VX to the result of a bitwise AND operation on a random number and NN."
             // TODO
+			Chip8::unsupportedOpcode(current_opcode, pc);
             break;
         case 0xD000:
             // DXYN "Draw a sprite at position VX, VY with N bytes of sprite data starting at the address stored in I."
             // TODO
+			Chip8::unsupportedOpcode(current_opcode, pc);
             break;
         case 0xE000:
             switch(current_opcode & 0x00FF)
@@ -357,10 +392,12 @@ void Chip8::emulateCycle()
                 case 0x009E:
                     // EX9E "Skips the next instruction if the key stored in VX is pressed."
                     // TODO
+					Chip8::unsupportedOpcode(current_opcode, pc);
                     break;
                 case 0x00A1:
                     // EXA1 "Skips the next instruction if the key stored in VX isn't pressed."
                     // TODO
+					Chip8::unsupportedOpcode(current_opcode, pc);
                     break;
                 default:
                     std::cout << "Unknown instruction: " << current_opcode << std::endl;
@@ -373,38 +410,47 @@ void Chip8::emulateCycle()
                 case 0x0007:
                     // FX07 "Sets VX to the value of the delay timer.
                     // TODO
+					Chip8::unsupportedOpcode(current_opcode, pc);
                     break;
                 case 0x000A:
                     // FX0A "A key press is awaited and then stored in VX."
                     // TODO
+					Chip8::unsupportedOpcode(current_opcode, pc);
                     break;
                 case 0x0015:
                     // FX15 "Sets the delay timer to VX."
                     // TODO
+					Chip8::unsupportedOpcode(current_opcode, pc);
                     break;
                 case 0x0018:
                     // FX18 "Sets the sound timer to VX."
                     // TODO
+					Chip8::unsupportedOpcode(current_opcode, pc);
                     break;
                 case 0x001E:
                     // FX1E "Adds VX to I."
                     // TODO
+					Chip8::unsupportedOpcode(current_opcode, pc);
                     break;
                 case 0x0029:
                     // FX29 "Sets I to the location of the sprite for the character in VX.
                     // TODO
+					Chip8::unsupportedOpcode(current_opcode, pc);
                     break;
                 case 0x0033:
                     // FX33 "Store the binary-coded decimal equivalent of the value stored in register VX at addresses I, I+1, and I+2."
                     // TODO
+					Chip8::unsupportedOpcode(current_opcode, pc);
                     break;
                 case 0x0055:
                     // FX55 "Stores V0 to VX in memory starting at address I."
                     // TODO
+					Chip8::unsupportedOpcode(current_opcode, pc);
                     break;
                 case 0x0065:
                     // FX65 "Fills V0 to VX with values from memory starting at address I."
                     // TODO
+					Chip8::unsupportedOpcode(current_opcode, pc);
                     break;
                 default:
                     std::cout << "Unknown instruction: " << current_opcode << std::endl;
@@ -437,6 +483,7 @@ bool Chip8::clearScreen()
             screen[row][col] = 0;
         }
     }
+	return true;
 }
 
 /*
@@ -481,6 +528,7 @@ void Chip8::dumpState()
 
 void Chip8::unsupportedOpcode(unsigned short opcode, unsigned short pc)
 {
+	printf("Opcode not yet supported! PC: %X. Opcode: %X.\n", pc, opcode);
 }
 
 
