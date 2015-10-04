@@ -8,8 +8,8 @@
 #include <iostream>
 #include <string>
 #include <stdio.h>
-#include "chip8.h"
-#include "tests.h"
+#include "Chip8.h"
+#include "Chip8Tester.h"
 
 #define TESTING true
 
