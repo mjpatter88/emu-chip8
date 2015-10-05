@@ -8,6 +8,7 @@ class Chip8Tester : public Chip8
 private:
 	bool testClearScreen();
 	bool testSetRegisterToImmediateValue();
+	bool testSetI();
 public:
 	void runTests();
 

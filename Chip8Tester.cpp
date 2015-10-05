@@ -8,6 +8,7 @@ void Chip8Tester::runTests() {
 	
 	allTestsPassed &= testClearScreen();
 	allTestsPassed &= testSetRegisterToImmediateValue();
+	allTestsPassed &= testSetI();
 
 
 	if (allTestsPassed) {
@@ -64,6 +65,25 @@ bool Chip8Tester::testSetRegisterToImmediateValue() {
 	}
 	else {
 		std::cout << "*****testSetRegisterToImmediateValue failed!" << std::endl;
+	}
+	return success;
+}
+
+bool Chip8Tester::testSetI() {
+	initialize();
+	bool success = true;
+
+	// Set the next instruction to 0xA513 to set I to 0x513
+	memory[PC_START] = 0xA5;
+	memory[PC_START + 1] = 0x13;
+	emulateCycle();
+
+	success = (index_reg == 0x513);
+	if (success) {
+		std::cout << "testSetI passed!" << std::endl;
+	}
+	else {
+		std::cout << "*****testSetI failed!" << std::endl;
 	}
 	return success;
 }

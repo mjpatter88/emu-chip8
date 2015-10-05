@@ -38,7 +38,7 @@ class Chip8 {
         unsigned char v_registers[NUM_REG];
 
         /*
-         * 16-bit address register, used to index memory.
+         * 16-bit address register (I), used to index memory.
          */
         unsigned short index_reg;
 

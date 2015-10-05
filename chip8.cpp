@@ -250,8 +250,8 @@ void Chip8::emulateCycle()
         case 0xA000:
 		{
 			// ANNN "Sets I to the address NNN."
-			// TODO
-			Chip8::unsupportedOpcode(current_opcode, pc);
+			index_reg = (current_opcode & 0x0FFF);
+			pc = pc + 2;
 			break;
 		}
         case 0xB000:
