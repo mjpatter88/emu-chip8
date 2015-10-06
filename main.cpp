@@ -179,7 +179,7 @@ void drawScreen(SDL_Renderer *renderer, Chip8 chip)
  */
 void drawPixel(SDL_Renderer *renderer, int row, int col)
 {
-    printf("ROW: %d, COL %d\n", row, col);
+    //printf("ROW: %d, COL %d\n", row, col);
     SDL_Rect r;
     r.x=col*10;
     r.y=row*10;

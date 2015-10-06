@@ -85,6 +85,14 @@ void Chip8::emulateCycle()
     draw_flag = 0;
 	v_registers[0xF] = 0;
 
+    // Update timers
+	if (delay_timer > 0) {
+		delay_timer--;
+	}
+	if (sound_timer > 0) {
+		sound_timer--;
+	}
+
     // Decode and execute the opcode
     // "https://en.wikipedia.org/wiki/CHIP-8#Opcode_table"
     switch(current_opcode & 0xF000)
@@ -110,8 +118,7 @@ void Chip8::emulateCycle()
                 default:
 				{
 					// 0NNN "Calls RCA 1802 program at address NNN. Not necessary for most ROMs."
-					// TODO
-					Chip8::unsupportedOpcode(current_opcode, pc);
+					pc = (current_opcode & 0x0FFF);
 					break;
 				}
             }
@@ -163,8 +170,10 @@ void Chip8::emulateCycle()
         case 0x7000:
 		{
 			// 7XNN "Adds NN to VX."
-			// TODO
-			Chip8::unsupportedOpcode(current_opcode, pc);
+			int registerIndex = (current_opcode & 0x0F00) >> 8;
+			int immediateValue = (current_opcode & 0x00FF);
+			v_registers[registerIndex] += immediateValue;
+			pc = pc + 2;
 			break;
 		}
         case 0x8000:
@@ -344,8 +353,9 @@ void Chip8::emulateCycle()
                 case 0x0015:
 				{
 					// FX15 "Sets the delay timer to VX."
-					// TODO
-					Chip8::unsupportedOpcode(current_opcode, pc);
+					int registerIndex = (current_opcode & 0x0F00) >> 8;
+					delay_timer = v_registers[registerIndex];
+					pc = pc + 2;
 					break;
 				}
                 case 0x0018:
@@ -404,7 +414,6 @@ void Chip8::emulateCycle()
 			break;
 		}
     }
-    // Update timers etc. TODO
 
 }
 

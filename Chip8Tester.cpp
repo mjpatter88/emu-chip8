@@ -6,11 +6,13 @@ void Chip8Tester::runTests() {
 	bool allTestsPassed = true;
 	std::cout << "Running tests...\n\n";
 	
+	allTestsPassed &= testJumpToMachineCode();
 	allTestsPassed &= testClearScreen();
 	allTestsPassed &= testSetRegisterToImmediateValue();
 	allTestsPassed &= testSetI();
-
+	allTestsPassed &= testAdd();
 	allTestsPassed &= testDrawSprite();
+	allTestsPassed &= testSetDelayTimer();
 
 	if (allTestsPassed) {
 		std::cout << "\n\n\nAll tests passed!";
@@ -19,6 +21,25 @@ void Chip8Tester::runTests() {
 		std::cout << "\n\n\nTESTS FAILED!!!!";
 	}
 	return;
+}
+
+bool Chip8Tester::testJumpToMachineCode() {
+	initialize();
+	bool success = true;
+
+	// Set the next instruction to 0x0272to jump to 0x272.
+	memory[PC_START] = 0x02;
+	memory[PC_START + 1] = 0x72;
+	emulateCycle();
+
+	success = (pc == 0x272);
+	if (success) {
+		std::cout << "testJumpToMachineCode passed!" << std::endl;
+	}
+	else {
+		std::cout << "*****testJumpToMachineCode failed!" << std::endl;
+	}
+	return success;
 }
 
 bool Chip8Tester::testClearScreen() {
@@ -42,6 +63,9 @@ bool Chip8Tester::testClearScreen() {
 			}
         }
     }
+	if (pc != PC_START + 2) {
+		success = false;
+	}
 	if (success) {
 		std::cout << "testClearScreen passed!" << std::endl;
 	}
@@ -61,6 +85,9 @@ bool Chip8Tester::testSetRegisterToImmediateValue() {
 	emulateCycle();
 
 	success = (v_registers[5] == 0x11);
+	if (pc != PC_START + 2) {
+		success = false;
+	}
 	if (success) {
 		std::cout << "testSetRegisterToImmediateValue passed!" << std::endl;
 	}
@@ -80,6 +107,9 @@ bool Chip8Tester::testSetI() {
 	emulateCycle();
 
 	success = (index_reg == 0x513);
+	if (pc != PC_START + 2) {
+		success = false;
+	}
 	if (success) {
 		std::cout << "testSetI passed!" << std::endl;
 	}
@@ -122,6 +152,9 @@ bool Chip8Tester::testDrawSprite() {
 	{
 		success = false;
 	}
+	if (pc != PC_START + 2) {
+		success = false;
+	}
 
 	if (success) {
 		std::cout << "testDrawSprite passed!" << std::endl;
@@ -131,3 +164,53 @@ bool Chip8Tester::testDrawSprite() {
 	}
 	return success;
 }
+
+bool Chip8Tester::testAdd() {
+	initialize();
+	bool success = true;
+
+	// Set the initial value of the register
+	v_registers[5] = 12;
+
+	// Set the next instruction to 0x750F to add 15 to V[5]
+	memory[PC_START] = 0x75;
+	memory[PC_START + 1] = 0x0F;
+	emulateCycle();
+
+	success = (v_registers[5] == 27);
+	if (pc != PC_START + 2) {
+		success = false;
+	}
+	if (success) {
+		std::cout << "testAdd passed!" << std::endl;
+	}
+	else {
+		std::cout << "*****testAdd failed!" << std::endl;
+	}
+	return success;
+}
+
+bool Chip8Tester::testSetDelayTimer() {
+	initialize();
+	bool success = true;
+
+	// Set the next instruction to 0xF615 to set the delay timer to the value of V[6]
+	v_registers[6] = 32;
+	memory[PC_START] = 0xF6;
+	memory[PC_START + 1] = 0x15;
+	emulateCycle();
+
+	success = (delay_timer == 32);
+	if (pc != PC_START + 2) {
+		success = false;
+	}
+	if (success) {
+		std::cout << "testSetDelayTimer passed!" << std::endl;
+	}
+	else {
+		std::cout << "*****testSetDelayTimer failed!" << std::endl;
+	}
+	return success;
+}
+
+

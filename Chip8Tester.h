@@ -6,10 +6,13 @@
 class Chip8Tester : public Chip8
 {
 private:
+	bool testJumpToMachineCode();
 	bool testClearScreen();
 	bool testSetRegisterToImmediateValue();
 	bool testSetI();
 	bool testDrawSprite();
+	bool testAdd();
+	bool testSetDelayTimer();
 public:
 	void runTests();
 
