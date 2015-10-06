@@ -37,6 +37,7 @@ void Chip8::initialize()
     //screen[10][10] = 1;
 
     // TODO: implement the rest of this function
+	// Set all memory to '0's.
 }
 
 /*
@@ -82,6 +83,7 @@ void Chip8::emulateCycle()
     
     //We don't need to draw unless 0x00E0 or 0xDXYN are executed.
     draw_flag = 0;
+	v_registers[0xF] = 0;
 
     // Decode and execute the opcode
     // "https://en.wikipedia.org/wiki/CHIP-8#Opcode_table"
@@ -271,8 +273,28 @@ void Chip8::emulateCycle()
         case 0xD000:
 		{
 			// DXYN "Draw a sprite at position VX, VY with N bytes of sprite data starting at the address stored in I."
-			// TODO
-			Chip8::unsupportedOpcode(current_opcode, pc);
+			int column = v_registers[(current_opcode & 0x0F00) >> 8];
+			int row = v_registers[(current_opcode & 0x00F0) >> 4];
+			int numRows = current_opcode & 0x000F;
+			for (int i = 0; i < numRows; i++) {
+				for (int j = 0; j < 8; j++) {
+					// Each byte is a row, each bit is a pixel
+					int bitValue = (memory[index_reg + i] >> (7-j)) & 0b00000001;
+					if (bitValue == 1) {
+						if (screen[row + i][column + j] == 1) {
+							//Set VF register
+							v_registers[0xF] = 1;
+							screen[row + i][column + j] = 0;
+						}
+						else {
+							screen[row + i][column + j] = 1;
+						}
+					}
+				}
+			}
+
+			pc = pc + 2;
+			draw_flag = 1;
 			break;
 		}
         case 0xE000:

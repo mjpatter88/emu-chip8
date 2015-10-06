@@ -10,6 +10,7 @@ void Chip8Tester::runTests() {
 	allTestsPassed &= testSetRegisterToImmediateValue();
 	allTestsPassed &= testSetI();
 
+	allTestsPassed &= testDrawSprite();
 
 	if (allTestsPassed) {
 		std::cout << "\n\n\nAll tests passed!";
@@ -84,6 +85,49 @@ bool Chip8Tester::testSetI() {
 	}
 	else {
 		std::cout << "*****testSetI failed!" << std::endl;
+	}
+	return success;
+}
+
+bool Chip8Tester::testDrawSprite() {
+	initialize();
+	bool success = true;
+
+	// In order to draw a sprite, we need a sprite in memory at address I
+	index_reg = 0x0;
+	memory[0] = 0b01100000;
+	memory[1] = 0b10010000;
+	memory[2] = 0b10010000;			// Draw a "0"
+	memory[3] = 0b10010000;
+	memory[4] = 0b01100000;
+
+	// We also need the X-coordinate in V[0] and the Y-coordinate in V[1]
+	v_registers[0] = 10;
+	v_registers[1] = 5;
+
+	// Set the next instruction to 0xD015 to draw the sprite. (5 rows, using V[0] and v[1])
+	memory[PC_START] = 0xD0;
+	memory[PC_START + 1] = 0x15;
+	emulateCycle();
+
+	// Verify that the drawFlag is set and the correct screen pixels are on.
+	if (getDrawFlag() == false) {
+		success = false;
+	}
+	if ((screen[5][11] != 1) || (screen[5][12] != 1)
+		|| (screen[6][10] != 1) || (screen[6][13] != 1)
+		|| (screen[7][10] != 1) || (screen[7][13] != 1)
+		|| (screen[8][10] != 1) || (screen[8][13] != 1)
+		|| (screen[9][11] != 1) || (screen[9][12] != 1))
+	{
+		success = false;
+	}
+
+	if (success) {
+		std::cout << "testDrawSprite passed!" << std::endl;
+	}
+	else {
+		std::cout << "*****testDrawSprite failed!" << std::endl;
 	}
 	return success;
 }

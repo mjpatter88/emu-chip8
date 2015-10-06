@@ -11,7 +11,7 @@
 #include "Chip8.h"
 #include "Chip8Tester.h"
 
-#define TESTING true
+#define TESTING false
 
 int start(int argc, char* argv[]);
 int initRenderer(SDL_Window *window, SDL_Renderer **renderer);
@@ -66,7 +66,6 @@ int start(int argc, char* argv[]) {
     // Emulation and SDL event loop flags
     long count = 0;
     bool user_quit = false;
-    bool draw = true;//TODO: remvove this variable once the cpu implements the drawFlag appropriately
 
     // Set a new timer for the next cycle
     SDL_TimerID tid = SDL_AddTimer((1000/FREQ), cycleCallback, NULL);
@@ -85,11 +84,10 @@ int start(int argc, char* argv[]) {
                     std::cout << "Cycle " << count << std::endl;
                 }
                 chip.emulateCycle();
-                if(draw || chip.getDrawFlag()) {
+                if(chip.getDrawFlag()) {
                     drawScreen(renderer, chip);
                 }
                 count++;
-                draw = false;
                 break;
             default:
                 //printf("Unhandled event\n");
@@ -181,7 +179,7 @@ void drawScreen(SDL_Renderer *renderer, Chip8 chip)
  */
 void drawPixel(SDL_Renderer *renderer, int row, int col)
 {
-    //printf("ROW: %d, COL %d\n", row, col);
+    printf("ROW: %d, COL %d\n", row, col);
     SDL_Rect r;
     r.x=col*10;
     r.y=row*10;

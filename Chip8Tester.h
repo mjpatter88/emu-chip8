@@ -9,6 +9,7 @@ private:
 	bool testClearScreen();
 	bool testSetRegisterToImmediateValue();
 	bool testSetI();
+	bool testDrawSprite();
 public:
 	void runTests();
 
