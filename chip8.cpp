@@ -140,22 +140,40 @@ void Chip8::emulateCycle()
         case 0x3000:
 		{
 			// 3XNN "Skips the next instruction if VX equals NN."
-			// TODO
-			Chip8::unsupportedOpcode(current_opcode, pc);
+			int registerIndex = (current_opcode & 0x0F00) >> 8;
+			int immediateVale = (current_opcode & 0x00FF);
+			if (v_registers[registerIndex] == immediateVale) {
+				pc = pc + 4;
+			}
+			else {
+				pc = pc + 2;
+			}
 			break;
 		}
         case 0x4000:
 		{
 			// 4XNN "Skips the next instruction if VX doesn't equal NN."
-			// TODO
-			Chip8::unsupportedOpcode(current_opcode, pc);
+			int registerIndex = (current_opcode & 0x0F00) >> 8;
+			int immediateVale = (current_opcode & 0x00FF);
+			if (v_registers[registerIndex] != immediateVale) {
+				pc = pc + 4;
+			}
+			else {
+				pc = pc + 2;
+			}
 			break;
 		}
         case 0x5000:
 		{
 			// 5XY0 "Skips the next instruction if VX equals VY."
-			// TODO
-			Chip8::unsupportedOpcode(current_opcode, pc);
+			int registerIndex = (current_opcode & 0x0F00) >> 8;
+			int registerIndex2 = (current_opcode & 0x00F0) >> 4;
+			if (v_registers[registerIndex] == v_registers[registerIndex2]) {
+				pc = pc + 4;
+			}
+			else {
+				pc = pc + 2;
+			}
 			break;
 		}
         case 0x6000:

@@ -13,6 +13,12 @@ private:
 	bool testDrawSprite();
 	bool testAdd();
 	bool testSetDelayTimer();
+	bool testSkipNotEqualImmediate_skip();
+	bool testSkipNotEqualImmediate_noSkip();
+	bool testSkipEqualImmediate_skip();
+	bool testSkipEqualImmediate_noSkip();
+	bool testSkipEqualRegister_skip();
+	bool testSkipEqualRegister_noSkip();
 public:
 	void runTests();
 
