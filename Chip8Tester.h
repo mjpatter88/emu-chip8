@@ -7,8 +7,10 @@ class Chip8Tester : public Chip8
 {
 private:
 	bool testJumpToMachineCode();
-	bool testJumpLocation();
 	bool testClearScreen();
+	bool testReturnFromSubroutine();
+	bool testJumpLocation();
+	bool testCallSubroutine();
 	bool testSetRegisterToImmediateValue();
 	bool testSetI();
 	bool testDrawSprite();

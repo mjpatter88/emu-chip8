@@ -7,8 +7,10 @@ void Chip8Tester::runTests() {
 	std::cout << "Running tests...\n\n";
 	
 	allTestsPassed &= testJumpToMachineCode();
-	allTestsPassed &= testJumpLocation();
 	allTestsPassed &= testClearScreen();
+	allTestsPassed &= testReturnFromSubroutine();
+	allTestsPassed &= testJumpLocation();
+	allTestsPassed &= testCallSubroutine();
 	allTestsPassed &= testSetRegisterToImmediateValue();
 	allTestsPassed &= testSetI();
 	allTestsPassed &= testAddImmediate();
@@ -66,6 +68,61 @@ bool Chip8Tester::testJumpLocation() {
 	}
 	else {
 		std::cout << "*****testJumpLocation failed!" << std::endl;
+	}
+	return success;
+}
+
+bool Chip8Tester::testCallSubroutine() {
+	initialize();
+	bool success = true;
+
+	// Set the next instruction to 0x2214 jump to 0x214.
+	memory[PC_START] = 0x22;
+	memory[PC_START + 1] = 0x14;
+	emulateCycle();
+
+	// Make sure pc is correct and that the stack is handled correctly.
+	success = (pc == 0x214);
+	if (stack[1] != PC_START + 2) {
+		success = false;
+	}
+	if (sp != 1) {
+		success = false;
+	}
+
+	if (success) {
+		std::cout << "testCallSubroutine passed!" << std::endl;
+	}
+	else {
+		std::cout << "*****testCallSubroutine failed!" << std::endl;
+	}
+	return success;
+}
+
+bool Chip8Tester::testReturnFromSubroutine() {
+	initialize();
+	bool success = true;
+
+	// Initialize the stack and stack pointer
+	sp = 1;
+	stack[sp] = 0x224;
+
+	// Set the next instruction to 0x00EE to return from a subroutine
+	memory[PC_START] = 0x00;
+	memory[PC_START + 1] = 0xEE;
+	emulateCycle();
+
+	// Make sure pc is correct and that the stack is handled correctly.
+	success = (pc == 0x224);
+	if (sp != 0) {
+		success = false;
+	}
+
+	if (success) {
+		std::cout << "testReturnFromSubroutine passed!" << std::endl;
+	}
+	else {
+		std::cout << "*****testReturnFromSubroutine failed!" << std::endl;
 	}
 	return success;
 }

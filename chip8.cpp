@@ -111,8 +111,10 @@ void Chip8::emulateCycle()
                 case 0x00EE:
 				{
 					// 00EE "Returns from a subroutine."
-					// TODO
-					Chip8::unsupportedOpcode(current_opcode, pc);
+					// Set pc to the address at the top of the stack.
+					// Subtract one from the stack pointer.
+					pc = stack[sp];
+					sp = sp - 1;
 					break;
 				}
                 default:
@@ -132,8 +134,12 @@ void Chip8::emulateCycle()
         case 0x2000:
 		{
 			// 2NNN "Calls subroutine at NNN."
-			// TODO
-			Chip8::unsupportedOpcode(current_opcode, pc);
+			// The stack pointer is incremented by 1.
+			// The address of the next instruction (current pc + 2) is put on the stack.
+			// The pc value is set to NNN.
+			sp = sp + 1;
+			stack[sp] = pc + 2;
+			pc = (current_opcode & 0x0FFF);
 			break;
 		}
         case 0x3000:
