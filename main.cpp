@@ -11,7 +11,7 @@
 #include "Chip8.h"
 #include "Chip8Tester.h"
 
-#define TESTING false
+#define TESTING true
 
 int start(int argc, char* argv[]);
 int initRenderer(SDL_Window *window, SDL_Renderer **renderer);

@@ -1,17 +1,18 @@
 #ifndef TEST_H_
 #define TEST_H_
 
-#include "Chip8.h";
+#include "Chip8.h"
 
 class Chip8Tester : public Chip8
 {
 private:
 	bool testJumpToMachineCode();
+	bool testJumpLocation();
 	bool testClearScreen();
 	bool testSetRegisterToImmediateValue();
 	bool testSetI();
 	bool testDrawSprite();
-	bool testAdd();
+	bool testAddImmediate();
 	bool testSetDelayTimer();
 	bool testSkipNotEqualImmediate_skip();
 	bool testSkipNotEqualImmediate_noSkip();
@@ -19,6 +20,8 @@ private:
 	bool testSkipEqualImmediate_noSkip();
 	bool testSkipEqualRegister_skip();
 	bool testSkipEqualRegister_noSkip();
+	bool testAddRegister_noCarry();
+	bool testAddRegister_Carry();
 public:
 	void runTests();
 

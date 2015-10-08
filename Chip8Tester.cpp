@@ -1,16 +1,17 @@
-#include "Chip8.h";
-#include "Chip8Tester.h";
-#include <iostream>;
+#include "Chip8.h"
+#include "Chip8Tester.h"
+#include <iostream>
 
 void Chip8Tester::runTests() {
 	bool allTestsPassed = true;
 	std::cout << "Running tests...\n\n";
 	
 	allTestsPassed &= testJumpToMachineCode();
+	allTestsPassed &= testJumpLocation();
 	allTestsPassed &= testClearScreen();
 	allTestsPassed &= testSetRegisterToImmediateValue();
 	allTestsPassed &= testSetI();
-	allTestsPassed &= testAdd();
+	allTestsPassed &= testAddImmediate();
 	allTestsPassed &= testDrawSprite();
 	allTestsPassed &= testSetDelayTimer();
 	allTestsPassed &= testSkipNotEqualImmediate_skip();
@@ -19,6 +20,8 @@ void Chip8Tester::runTests() {
 	allTestsPassed &= testSkipEqualImmediate_noSkip();
 	allTestsPassed &= testSkipEqualRegister_skip();
 	allTestsPassed &= testSkipEqualRegister_noSkip();
+	allTestsPassed &= testAddRegister_noCarry();
+	allTestsPassed &= testAddRegister_Carry();
 
 	if (allTestsPassed) {
 		std::cout << "\n\n\nAll tests passed!";
@@ -44,6 +47,25 @@ bool Chip8Tester::testJumpToMachineCode() {
 	}
 	else {
 		std::cout << "*****testJumpToMachineCode failed!" << std::endl;
+	}
+	return success;
+}
+
+bool Chip8Tester::testJumpLocation() {
+	initialize();
+	bool success = true;
+
+	// Set the next instruction to 0x1213 jump to 0x213.
+	memory[PC_START] = 0x12;
+	memory[PC_START + 1] = 0x13;
+	emulateCycle();
+
+	success = (pc == 0x213);
+	if (success) {
+		std::cout << "testJumpLocation passed!" << std::endl;
+	}
+	else {
+		std::cout << "*****testJumpLocation failed!" << std::endl;
 	}
 	return success;
 }
@@ -171,7 +193,7 @@ bool Chip8Tester::testDrawSprite() {
 	return success;
 }
 
-bool Chip8Tester::testAdd() {
+bool Chip8Tester::testAddImmediate() {
 	initialize();
 	bool success = true;
 
@@ -361,3 +383,62 @@ bool Chip8Tester::testSkipEqualRegister_noSkip() {
 	}
 	return success;
 }
+
+bool Chip8Tester::testAddRegister_noCarry() {
+	initialize();
+	bool success = true;
+
+	// Set the initial value of the registers
+	v_registers[5] = 12;
+	v_registers[6] = 13;
+
+	// Set the next instruction to 0x8564 to add V[6] (13) to V[5]
+	memory[PC_START] = 0x85;
+	memory[PC_START + 1] = 0x64;
+	emulateCycle();
+
+	success = (v_registers[5] == 25);
+	if (pc != PC_START + 2) {
+		success = false;
+	}
+	if (v_registers[0xF] != 0) {
+		success = false;
+	}
+	if (success) {
+		std::cout << "testAddRegister_noCarry passed!" << std::endl;
+	}
+	else {
+		std::cout << "*****testAddRegister_noCarry failed!" << std::endl;
+	}
+	return success;
+}
+
+bool Chip8Tester::testAddRegister_Carry() {
+	initialize();
+	bool success = true;
+
+	// Set the initial value of the register
+	v_registers[5] = 12;
+	v_registers[6] = 250;
+
+	// Set the next instruction to 0x8564 to add V[6] (250) to V[5]
+	memory[PC_START] = 0x85;
+	memory[PC_START + 1] = 0x64;
+	emulateCycle();
+
+	success = (v_registers[5] == ((12+250)&0xFF));
+	if (pc != PC_START + 2) {
+		success = false;
+	}
+	if (v_registers[0xF] != 1) {
+		success = false;
+	}
+	if (success) {
+		std::cout << "testAddRegister_Carry passed!" << std::endl;
+	}
+	else {
+		std::cout << "*****testAddRegister_Carry failed!" << std::endl;
+	}
+	return success;
+}
+
