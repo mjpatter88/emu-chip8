@@ -18,6 +18,8 @@ void Chip8Tester::runTests() {
 	allTestsPassed &= testSetDelayTimer();
 	allTestsPassed &= testSkipNotEqualImmediate_skip();
 	allTestsPassed &= testSkipNotEqualImmediate_noSkip();
+	allTestsPassed &= testSkipNotEqualRegister_skip();
+	allTestsPassed &= testSkipNotEqualRegister_noSkip();
 	allTestsPassed &= testSkipEqualImmediate_skip();
 	allTestsPassed &= testSkipEqualImmediate_noSkip();
 	allTestsPassed &= testSkipEqualRegister_skip();
@@ -342,6 +344,55 @@ bool Chip8Tester::testSkipNotEqualImmediate_noSkip() {
 	}
 	else {
 		std::cout << "*****testSkipNotEqualImmediate_noSkip failed!" << std::endl;
+	}
+	return success;
+}
+
+bool Chip8Tester::testSkipNotEqualRegister_skip() {
+
+	initialize();
+	bool success = true;
+
+	// Set the initial values of the register
+	v_registers[1] = 5;
+    v_registers[2] = 7;
+
+	// Set the next instruction to 0x9120 to skip since V[1] != V[2]
+	memory[PC_START] = 0x91;
+	memory[PC_START + 1] = 0x20;
+	emulateCycle();
+
+	success = (pc == PC_START + 4);
+	if (success) {
+		std::cout << "testSkipNotEqualRegister_skip passed!" << std::endl;
+	}
+	else {
+		std::cout << "*****testSkipNotEqualRegister_skip failed!" << std::endl;
+	}
+	return success;
+}
+
+
+bool Chip8Tester::testSkipNotEqualRegister_noSkip() {
+
+	initialize();
+	bool success = true;
+
+	// Set the initial values of the register
+	v_registers[1] = 5;
+	v_registers[2] = 5;
+
+	// Set the next instruction to 0x9120 to not skip since V[1] == V[2]
+	memory[PC_START] = 0x91;
+	memory[PC_START + 1] = 0x20;
+	emulateCycle();
+
+	success = (pc == PC_START + 2);
+	if (success) {
+		std::cout << "testSkipNotEqualRegister_noSkip passed!" << std::endl;
+	}
+	else {
+		std::cout << "*****testSkipNotEqualRegister_noSkip failed!" << std::endl;
 	}
 	return success;
 }

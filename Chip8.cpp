@@ -27,19 +27,8 @@ void Chip8::initialize()
 	//Initialize the rng. (Weak/predictable implementation is fine for this case.)
 	srand(time(NULL));
 
-    // For the sake of testing the draw screen function without a working CPU
-    //screen[0][0] = 1;
-    //screen[0][SCREEN_WIDTH-1] = 1;
-    //screen[SCREEN_HEIGHT-1][0] = 1;
-    //screen[SCREEN_HEIGHT-1][SCREEN_WIDTH-1] = 1;
-    //screen[2][2] = 1;
-    //screen[4][4] = 1;
-    //screen[6][6] = 1;
-    //screen[8][8] = 1;
-    //screen[10][10] = 1;
-
     // TODO: implement the rest of this function
-	// Set all memory to '0's.
+	// Set all memory to '0's?
 }
 
 /*
@@ -289,8 +278,14 @@ void Chip8::emulateCycle()
         case 0x9000:
 		{
 			// 9XY0 "Skips the next instruction if VX doesn't equal VY."
-			// TODO
-			Chip8::unsupportedOpcode(current_opcode, pc);
+			int registerIndex = (current_opcode & 0x0F00) >> 8;
+			int registerIndex2 = (current_opcode & 0x00F0) >> 4;
+			if (v_registers[registerIndex] != v_registers[registerIndex2]) {
+				pc = pc + 4;
+			}
+			else {
+				pc = pc + 2;
+			}
 			break;
 		}
         case 0xA000:

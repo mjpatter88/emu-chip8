@@ -18,6 +18,8 @@ private:
 	bool testSetDelayTimer();
 	bool testSkipNotEqualImmediate_skip();
 	bool testSkipNotEqualImmediate_noSkip();
+	bool testSkipNotEqualRegister_skip();
+	bool testSkipNotEqualRegister_noSkip();
 	bool testSkipEqualImmediate_skip();
 	bool testSkipEqualImmediate_noSkip();
 	bool testSkipEqualRegister_skip();
