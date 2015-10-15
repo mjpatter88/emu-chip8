@@ -509,8 +509,7 @@ bool Chip8Tester::testRandomAnd() {
 	memory[PC_START + 1] = 0x55;
 	emulateCycle();
 
-	// Can't really test the randomness, so just make sure it isn't zero for now.
-	success = (v_registers[5] != 0);
+	// Can't really test the randomness, so just make sure it moves to the next instruction for now.
 	if (pc != PC_START + 2) {
 		success = false;
 	}
