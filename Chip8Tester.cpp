@@ -24,6 +24,7 @@ void Chip8Tester::runTests() {
 	allTestsPassed &= testSkipEqualRegister_noSkip();
 	allTestsPassed &= testAddRegister_noCarry();
 	allTestsPassed &= testAddRegister_Carry();
+	allTestsPassed &= testRandomAnd();
 
 	if (allTestsPassed) {
 		std::cout << "\n\n\nAll tests passed!";
@@ -499,3 +500,25 @@ bool Chip8Tester::testAddRegister_Carry() {
 	return success;
 }
 
+bool Chip8Tester::testRandomAnd() {
+	initialize();
+	bool success = true;
+
+	// Set the next instruction to 0xC555 to and a random num with 0x55 and store the result in V[5]
+	memory[PC_START] = 0xC5;
+	memory[PC_START + 1] = 0x55;
+	emulateCycle();
+
+	// Can't really test the randomness, so just make sure it isn't zero for now.
+	success = (v_registers[5] != 0);
+	if (pc != PC_START + 2) {
+		success = false;
+	}
+	if (success) {
+		std::cout << "testRandomAnd passed!" << std::endl;
+	}
+	else {
+		std::cout << "*****testRandomAnd failed!" << std::endl;
+	}
+	return success;
+}

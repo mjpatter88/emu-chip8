@@ -24,6 +24,8 @@ void Chip8::initialize()
     //Blank screen to start
     clearScreen();
 
+	//Initialize the rng. (Weak/predictable implementation is fine for this case.)
+	srand(time(NULL));
 
     // For the sake of testing the draw screen function without a working CPU
     //screen[0][0] = 1;
@@ -308,8 +310,13 @@ void Chip8::emulateCycle()
         case 0xC000:
 		{
 			// CXNN "Sets VX to the result of a bitwise AND operation on a random number and NN."
-			// TODO
-			Chip8::unsupportedOpcode(current_opcode, pc);
+			// Generate a random number from 0 to 255, AND it with NN, set result in V[X]
+			int randNum = rand() % 0xFF;
+			int immediateValue = (current_opcode & 0x00FF);
+			int registerIndex = (current_opcode & 0x0F00) >> 8;
+			randNum = randNum & immediateValue;
+			v_registers[registerIndex] = randNum;
+			pc = pc + 2;
 			break;
 		}
         case 0xD000:

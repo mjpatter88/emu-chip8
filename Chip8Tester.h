@@ -24,6 +24,7 @@ private:
 	bool testSkipEqualRegister_noSkip();
 	bool testAddRegister_noCarry();
 	bool testAddRegister_Carry();
+	bool testRandomAnd();
 public:
 	void runTests();
 

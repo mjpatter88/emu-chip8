@@ -5,6 +5,8 @@
 
 
 #include <string>
+#include <stdlib.h>
+#include <time.h>
 
 #define DEBUG true      // Debug output
 #define DEBUG_MEM true  // Debug output - print memory contents
