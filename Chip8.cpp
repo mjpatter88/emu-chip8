@@ -76,13 +76,6 @@ void Chip8::emulateCycle()
     draw_flag = 0;
 	v_registers[0xF] = 0;
 
-    // Update timers
-	if (delay_timer > 0) {
-		delay_timer--;
-	}
-	if (sound_timer > 0) {
-		sound_timer--;
-	}
 
     // Decode and execute the opcode
     // "https://en.wikipedia.org/wiki/CHIP-8#Opcode_table"
@@ -373,8 +366,9 @@ void Chip8::emulateCycle()
                 case 0x0007:
 				{
 					// FX07 "Sets VX to the value of the delay timer.
-					// TODO
-					Chip8::unsupportedOpcode(current_opcode, pc);
+                    int registerIndex = (current_opcode &0x0F00) >> 8;
+                    v_registers[registerIndex] = delay_timer;
+                    pc = pc + 2;
 					break;
 				}
                 case 0x000A:
@@ -449,6 +443,13 @@ void Chip8::emulateCycle()
 		}
     }
 
+    // Update timers
+	if (delay_timer > 0) {
+		delay_timer--;
+	}
+	if (sound_timer > 0) {
+		sound_timer--;
+	}
 }
 
 /*

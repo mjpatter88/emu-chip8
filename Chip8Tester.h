@@ -28,6 +28,7 @@ private:
 	bool testAddRegister_noCarry();
 	bool testAddRegister_Carry();
 	bool testRandomAnd();
+    bool testLoadDelayTimerValue();
 public:
 	void runTests();
 

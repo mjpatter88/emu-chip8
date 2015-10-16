@@ -28,6 +28,7 @@ void Chip8Tester::runTests() {
 	allTestsPassed &= testAddRegister_noCarry();
 	allTestsPassed &= testAddRegister_Carry();
 	allTestsPassed &= testRandomAnd();
+	allTestsPassed &= testLoadDelayTimerValue();
 
 	if (allTestsPassed) {
 		std::cout << "\n\n\nAll tests passed!";
@@ -311,7 +312,7 @@ bool Chip8Tester::testSetDelayTimer() {
 	memory[PC_START + 1] = 0x15;
 	emulateCycle();
 
-	success = (delay_timer == 32);
+	success = (delay_timer == 31);  // Timer will count down by one since we executed a cycle.
 	if (pc != PC_START + 2) {
 		success = false;
 	}
@@ -592,6 +593,31 @@ bool Chip8Tester::testRandomAnd() {
 	}
 	else {
 		std::cout << "*****testRandomAnd failed!" << std::endl;
+	}
+	return success;
+}
+
+bool Chip8Tester::testLoadDelayTimerValue() {
+	initialize();
+	bool success = true;
+
+    // Set the initial timer value
+    delay_timer = 0x20;
+
+	// Set the next instruction to 0xF207 to place the timer value in the V[2] register.
+	memory[PC_START] = 0xF2;
+	memory[PC_START + 1] = 0x07;
+	emulateCycle();
+
+    success = (v_registers[2] == 0x20);
+	if (pc != PC_START + 2) {
+		success = false;
+	}
+	if (success) {
+		std::cout << "testLoadDelayTimerValue passed!" << std::endl;
+	}
+	else {
+		std::cout << "*****testLoadDelayTimerValue failed!" << std::endl;
 	}
 	return success;
 }
