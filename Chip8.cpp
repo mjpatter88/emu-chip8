@@ -298,8 +298,7 @@ void Chip8::emulateCycle()
         case 0xB000:
 		{
 			// BNNN "Jumps to the address NNN plus V0."
-			// TODO
-			Chip8::unsupportedOpcode(current_opcode, pc);
+            pc = v_registers[0] + (current_opcode & 0x0FFF);
 			break;
 		}
         case 0xC000:

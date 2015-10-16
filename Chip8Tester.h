@@ -10,6 +10,7 @@ private:
 	bool testClearScreen();
 	bool testReturnFromSubroutine();
 	bool testJumpLocation();
+    bool testJumpToImmediatePlusRegister();
 	bool testCallSubroutine();
 	bool testSetRegisterToImmediateValue();
 	bool testSetI();

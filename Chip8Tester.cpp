@@ -10,6 +10,7 @@ void Chip8Tester::runTests() {
 	allTestsPassed &= testClearScreen();
 	allTestsPassed &= testReturnFromSubroutine();
 	allTestsPassed &= testJumpLocation();
+    allTestsPassed &= testJumpToImmediatePlusRegister();
 	allTestsPassed &= testCallSubroutine();
 	allTestsPassed &= testSetRegisterToImmediateValue();
 	allTestsPassed &= testSetI();
@@ -71,6 +72,28 @@ bool Chip8Tester::testJumpLocation() {
 	}
 	else {
 		std::cout << "*****testJumpLocation failed!" << std::endl;
+	}
+	return success;
+}
+
+bool Chip8Tester::testJumpToImmediatePlusRegister() {
+	initialize();
+	bool success = true;
+
+    // Set the initial register value
+    v_registers[0] = 0x010;
+
+	// Set the next instruction to 0xB059 jump to V[0] + 0x59 = 0x69.
+	memory[PC_START] = 0xB0;
+	memory[PC_START + 1] = 0x59;
+	emulateCycle();
+
+	success = (pc == 0x69);
+	if (success) {
+		std::cout << "testJumpToImmediatePlusRegister passed!" << std::endl;
+	}
+	else {
+		std::cout << "*****testJumpToImmediatePlusRegister failed!" << std::endl;
 	}
 	return success;
 }
