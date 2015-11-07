@@ -17,6 +17,7 @@ private:
 	bool testDrawSprite();
 	bool testAddImmediate();
 	bool testSetDelayTimer();
+	bool testSetSoundTimer();
 	bool testSkipNotEqualImmediate_skip();
 	bool testSkipNotEqualImmediate_noSkip();
 	bool testSkipNotEqualRegister_skip();

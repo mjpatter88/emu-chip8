@@ -389,8 +389,9 @@ void Chip8::emulateCycle()
                 case 0x0018:
 				{
 					// FX18 "Sets the sound timer to VX."
-					// TODO
-					Chip8::unsupportedOpcode(current_opcode, pc);
+					int registerIndex = (current_opcode & 0x0F00) >> 8;
+					sound_timer = v_registers[registerIndex];
+					pc = pc + 2;
 					break;
 				}
                 case 0x001E:

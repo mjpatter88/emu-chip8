@@ -17,6 +17,7 @@ void Chip8Tester::runTests() {
 	allTestsPassed &= testAddImmediate();
 	allTestsPassed &= testDrawSprite();
 	allTestsPassed &= testSetDelayTimer();
+	allTestsPassed &= testSetSoundTimer();
 	allTestsPassed &= testSkipNotEqualImmediate_skip();
 	allTestsPassed &= testSkipNotEqualImmediate_noSkip();
 	allTestsPassed &= testSkipNotEqualRegister_skip();
@@ -325,6 +326,29 @@ bool Chip8Tester::testSetDelayTimer() {
 	return success;
 }
 
+bool Chip8Tester::testSetSoundTimer() {
+	initialize();
+	bool success = true;
+
+	// Set the next instruction to 0xF618 to set the sound timer to the value of V[6]
+	v_registers[6] = 32;
+	memory[PC_START] = 0xF6;
+	memory[PC_START + 1] = 0x18;
+	emulateCycle();
+
+	success = (sound_timer == 31);  // Timer will count down by one since we executed a cycle.
+	if (pc != PC_START + 2) {
+		success = false;
+	}
+	if (success) {
+		std::cout << "testSetSoundTimer passed!" << std::endl;
+	}
+	else {
+		std::cout << "*****testSetSoundTimer failed!" << std::endl;
+	}
+	return success;
+}
+
 bool Chip8Tester::testSkipNotEqualImmediate_skip() {
 
 	initialize();
@@ -347,7 +371,6 @@ bool Chip8Tester::testSkipNotEqualImmediate_skip() {
 	}
 	return success;
 }
-
 
 bool Chip8Tester::testSkipNotEqualImmediate_noSkip() {
 
@@ -396,7 +419,6 @@ bool Chip8Tester::testSkipNotEqualRegister_skip() {
 	return success;
 }
 
-
 bool Chip8Tester::testSkipNotEqualRegister_noSkip() {
 
 	initialize();
@@ -444,7 +466,6 @@ bool Chip8Tester::testSkipEqualImmediate_skip() {
 	return success;
 }
 
-
 bool Chip8Tester::testSkipEqualImmediate_noSkip() {
 
 	initialize();
@@ -491,7 +512,6 @@ bool Chip8Tester::testSkipEqualRegister_skip() {
 	}
 	return success;
 }
-
 
 bool Chip8Tester::testSkipEqualRegister_noSkip() {
 
@@ -621,3 +641,4 @@ bool Chip8Tester::testLoadDelayTimerValue() {
 	}
 	return success;
 }
+
